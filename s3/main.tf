@@ -4,10 +4,10 @@ provider "aws" {
 
 resource "aws_s3_bucket" "example" {
   bucket = "terraform-example-s3-sumin"
-
+  force_destroy = true
   # 삭제 방지
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
   # deprecated 된 내용들 (https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket)
 #   versioning {
