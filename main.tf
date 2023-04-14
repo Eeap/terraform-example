@@ -1,5 +1,5 @@
 provider "aws" {
-    region = "us-west-2"
+    region = "us-east-2"
 }
 
 # resource "aws_instance" "example" {
@@ -84,13 +84,16 @@ resource "aws_lb_listener_rule" "alb_listener" {
     target_group_arn = aws_lb_target_group.alb_tg.arn
   }
 }
+
 output "alb_dns_name" {
   value=aws_lb.example.dns_name
   description = "alb dns name"
 }
+
 resource "aws_launch_configuration" "example" {
   image_id = "ami-0c55b159cbfafe1f0"
   instance_type = "t2.micro"
+
   security_groups = [aws_security_group.example_sg.id]
 
   user_data = <<-EOF
@@ -98,7 +101,11 @@ resource "aws_launch_configuration" "example" {
               echo "Hello, World!" > index.html
               nohup busybox httpd -f -p ${var.server_port} &
               EOF
+  lifecycle {
+    create_before_destroy = true
+  }
 }
+
 resource "aws_autoscaling_group" "example" {
   launch_configuration = aws_launch_configuration.example.name
   vpc_zone_identifier = data.aws_subnets.default.ids
@@ -113,10 +120,6 @@ resource "aws_autoscaling_group" "example" {
     value = "terraform-asg-example"
     propagate_at_launch = true
   }
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 resource "aws_security_group" "example_sg" {
     name = "terraform-example-instance"
@@ -129,6 +132,7 @@ resource "aws_security_group" "example_sg" {
     } 
   
 }
+
 variable "server_port" {
   description = "example variable"
   type = number
