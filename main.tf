@@ -41,13 +41,13 @@ resource "aws_lb_listener" "http" {
 resource "aws_security_group" "lb_example_sg" {
   name = "terraform-example-alb"
 
-  ingress = {
+  ingress {
     cidr_blocks = [ "0.0.0.0/0" ]
     from_port = 80
     protocol = "tcp"
     to_port = 80
   }
-  egress = {
+  egress {
     cidr_blocks = [ "0.0.0.0/0" ]
     from_port = 0
     protocol = "-1"
@@ -81,7 +81,7 @@ resource "aws_lb_listener_rule" "alb_listener" {
   }
   action {
     type = "forward"
-    target_group_arn = aws_lb_target_group.alb_tg.alb_tg.arn
+    target_group_arn = aws_lb_target_group.alb_tg.arn
   }
 }
 output "alb_dns_name" {
@@ -101,7 +101,7 @@ resource "aws_launch_configuration" "example" {
 }
 resource "aws_autoscaling_group" "example" {
   launch_configuration = aws_launch_configuration.example.name
-  vpc_zone_identifier = data.aws_subnet_ids.default.ids
+  vpc_zone_identifier = data.aws_subnets.default.ids
 
   target_group_arns = [aws_lb_target_group.alb_tg.arn]
   health_check_type = "ELB"
@@ -135,10 +135,10 @@ variable "server_port" {
   default = 8080
 }
 
-output "public_ip" {
-  value=aws_instance.example.public_ip
-  description = "ec2-public-ip"
-}
+# output "public_ip" {
+#   value=aws_instance.example.public_ip
+#   description = "ec2-public-ip"
+# }
 
 data "aws_vpc" "default" {
   default = true
