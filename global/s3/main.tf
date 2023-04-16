@@ -5,7 +5,7 @@ provider "aws" {
 resource "aws_s3_bucket" "example" {
   bucket = "terraform-example-s3-sumin"
   force_destroy = true
-  # 삭제 방지
+  # delete protection
   lifecycle {
     prevent_destroy = false
   }
@@ -47,6 +47,7 @@ resource "aws_dynamodb_table" "example" {
     type = "S"
   }
 }
+# 처음 init 시에는 해당 s3과 dynamodb가 없으므로 아래를 주석처리하고 apply한 다음 다시 해제하고 init
 terraform {
   backend "s3" {
     key = "global/s3/terraform.tfstate"

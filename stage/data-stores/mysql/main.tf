@@ -7,12 +7,14 @@ resource "aws_db_instance" "example" {
   engine = "mysql"
   allocated_storage = 10
   instance_class = "db.t2.micro"
-  name = "example-db"
+  db_name = "exampleDb"
   username = "admin"
-  password = data.aws_secretsmanager_secret_version.db_password.secret_string
+  manage_master_user_password   = true
+  master_user_secret_kms_key_id = aws_kms_key.example.key_id
+  skip_final_snapshot = true
 }
-data "aws_secretsmanager_secret_version" "db_password" {
-  secret_id = "mysql-master-password-stage"
+resource "aws_kms_key" "example" {
+  description = "mysql KMS Key"
 }
 
 terraform {
