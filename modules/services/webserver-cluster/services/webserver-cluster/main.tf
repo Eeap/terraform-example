@@ -36,19 +36,22 @@ resource "aws_lb_listener" "http" {
 }
 resource "aws_security_group" "lb_example_sg" {
   name = "${var.cluster_name}-alb"
-
-  ingress {
-    cidr_blocks = [ local.all_ips ]
-    from_port = local.http_port
-    protocol = local.tcp_protocol
-    to_port = local.http_port
-  }
-  egress {
-    cidr_blocks = [ local.all_ips ]
-    from_port = local.any_port
-    protocol = local.any_protocol
-    to_port = local.any_port
-  }
+}
+resource "aws_security_group_rule" "http_inbound" {
+  type = "ingress"
+  security_group_id = aws_security_group.lb_example_sg.id
+  cidr_blocks = local.all_ips
+  from_port = local.http_port
+  protocol = local.tcp_protocol
+  to_port = local.http_port
+}
+resource "aws_security_group_rule" "all_outbound" {
+  type = "engress"
+  security_group_id = aws_security_group.lb_example_sg.id
+  cidr_blocks = local.all_ips
+  from_port = local.any_port
+  protocol = local.any_protocol
+  to_port = local.any_port
 }
 resource "aws_lb_target_group" "alb_tg" {
   name = "${var.cluster_name}-alb-tg"
@@ -109,14 +112,15 @@ resource "aws_autoscaling_group" "example" {
   }
 }
 resource "aws_security_group" "example_sg" {
-    name = "${var.cluster_name}-instance"
-
-    ingress {
-      cidr_blocks = [ "0.0.0.0/0" ]
-      from_port = var.server_port
-      protocol = "tcp"
-      to_port = var.server_port
-    } 
+  name = "${var.cluster_name}-instance"
+}
+resource "aws_security_group_rule" "tcp_inbound" {
+  type = "ingress"
+  security_group_id = aws_security_group.example_sg
+  cidr_blocks = local.all_ips
+  from_port = var.server_port
+  protocol = local.tcp_protocol
+  to_port = var.server_port
   
 }
 data "aws_vpc" "default" {
@@ -139,7 +143,7 @@ data "terraform_remote_state" "db" {
    }
 }
 data "template_file" "user_data" {
-  template = file("user-data.sh")
+  template = file("${path.module}/user-data.sh")
 
   vars = {
     server_port = var.server_port

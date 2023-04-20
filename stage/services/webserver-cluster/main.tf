@@ -10,3 +10,11 @@ module "webserver_cluster" {
   max_size = 2
   instance_type = "t2.micro"
 }
+resource "aws_security_group_rule" "test_inbound" {
+  type = "ingress"
+  security_group_id = module.webserver_cluster.alb_security_group_id
+  from_port = 12345
+  to_port = 12345
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+}
