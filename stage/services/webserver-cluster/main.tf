@@ -2,7 +2,8 @@ provider "aws" {
   region = "us-east-2"
 }
 module "webserver_cluster" {
-  source = "../../../modules/services/webserver-cluster/services/webserver-cluster"
+  # source = "../../../modules/services/webserver-cluster/services/webserver-cluster"
+  source = "github.com/brikis98/terraform-up-and-running-code//code/terraform/04-terraform-module/module-example/modules/services/webserver-cluster?ref=v0.1.0"
   db_remote_state_bucket = "terraform-example-s3-sumin"
   db_db_remote_state_key = "stage/data-stores/mysql/terraform.tfstate"
   cluster_name = "webserver-stage"
@@ -10,6 +11,7 @@ module "webserver_cluster" {
   max_size = 2
   instance_type = "t2.micro"
 }
+
 resource "aws_security_group_rule" "test_inbound" {
   type = "ingress"
   security_group_id = module.webserver_cluster.alb_security_group_id
