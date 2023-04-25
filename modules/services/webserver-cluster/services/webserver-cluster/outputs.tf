@@ -10,3 +10,7 @@ output "alb_security_group_id" {
  value = aws_security_group.lb_example_sg.id
  description = "This is security group id of ALB" 
 }
+output "asg_name" {
+  value = aws_autoscaling_group.example.name
+  description = "name of the Auto Scaling Group"
+}
